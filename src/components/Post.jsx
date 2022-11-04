@@ -5,11 +5,28 @@ import { Comment } from "./Comment";
 import { Avatar } from './Avatar';
 
 import styles from './Post.module.css';
+import { useState } from 'react';
 
 export function Post({ data }) {
+  const [comments, setComments] = useState(['Post dahora!']);
+
+  const [newCommentText, setNewCommentText] = useState('');
+
   const publishedDateFormatted = format(data.publishedAt, "d 'de' LLLL 'às' HH:mm'h'", { locale: ptBR });
 
   const publishedDateRelativeToNoew = formatDistanceToNow(data.publishedAt, { locale: ptBR, addSuffix: true });
+
+  function handleCreateNewComment() {
+    event.preventDefault();
+
+    setComments([...comments, newCommentText]);
+    setNewCommentText('');
+  }
+
+  function handleNewCommentChange() {
+    setNewCommentText(event.target.value);
+  }
+
 
   return (
     <article className={styles.post}>
@@ -41,11 +58,14 @@ export function Post({ data }) {
         })}
       </div>
 
-      <form className={styles.commentForm}>
+      <form onSubmit={handleCreateNewComment} className={styles.commentForm}>
         <strong>Deixe seu feedback</strong>
 
         <textarea
+          name="comment"
           placeholder="Deixe um comentário"
+          value={newCommentText}
+          onChange={handleNewCommentChange}
         />
 
         <footer>
@@ -54,7 +74,9 @@ export function Post({ data }) {
       </form>
 
       <div className={styles.commentList}>
-        <Comment />
+        {comments.map(comment => {
+          return <Comment content={comment} />
+        })}
       </div>
     </article>
   );
